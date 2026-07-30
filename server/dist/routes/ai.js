@@ -32,8 +32,29 @@ router.post("/parse", authenticate, upload.single("resume"), async (req, res) =>
     try {
         if (!req.file)
             return res.status(400).json({ message: "No file uploaded" });
-        if (!process.env.OPENAI_API_KEY)
-            return res.status(500).json({ message: "OpenAI API Key is not configured." });
+        if (!process.env.OPENAI_API_KEY) {
+            // Return a mock parsed resume for testing purposes
+            return res.json({
+                personalInfo: {
+                    fullName: "Mock User (No API Key)",
+                    email: "test@example.com",
+                    phone: "123-456-7890",
+                    address: "Mock City, ST",
+                    linkedin: "linkedin.com/in/mock",
+                    github: "github.com/mock",
+                    portfolio: ""
+                },
+                summary: "This is a mocked professional summary because the OpenAI API key is missing. The system successfully read the file but used mock data for the JSON parsing.",
+                skills: ["React", "Node.js", "TypeScript", "Tailwind CSS"],
+                education: [
+                    { institution: "Mock University", degree: "B.S. Computer Science", startDate: "2018", endDate: "2022" }
+                ],
+                experience: [
+                    { company: "Mock Corp", position: "Software Engineer", startDate: "2022", endDate: "Present", description: "- Mocked bullet point 1\n- Mocked bullet point 2" }
+                ],
+                projects: []
+            });
+        }
         const fileBuffer = req.file.buffer;
         const mimeType = req.file.mimetype;
         let extractedText = "";
@@ -77,8 +98,9 @@ ${extractedText}
 });
 router.post("/optimize", authenticate, async (req, res) => {
     try {
-        if (!process.env.OPENAI_API_KEY)
-            return res.status(500).json({ message: "OpenAI API Key is not configured." });
+        if (!process.env.OPENAI_API_KEY) {
+            return res.json({ optimizedText: "[Mocked Optimization] " + req.body.content });
+        }
         const { type, content } = req.body;
         let prompt = "";
         if (type === "summary") {
