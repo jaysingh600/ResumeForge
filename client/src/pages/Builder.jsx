@@ -181,9 +181,9 @@ export default function Builder() {
               <textarea {...register("summary")} rows={4} className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="A brief summary of your professional background..."></textarea>
             </section>
 
-            {/* Experience */}
+            {/* Experience & Internships */}
             <section>
-              <h2 className="text-xl font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">Experience</h2>
+              <h2 className="text-xl font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">Experience & Internships</h2>
               {expFields.map((field, index) => (
                 <div key={field.id} className="p-4 border border-slate-200 rounded-xl mb-4 bg-slate-50 relative group">
                   <button type="button" onClick={() => removeExp(index)} className="absolute top-4 right-4 text-slate-400 hover:text-red-500">
@@ -221,6 +221,87 @@ export default function Builder() {
               </button>
             </section>
 
+            {/* Education */}
+            <section>
+              <h2 className="text-xl font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">Education / Qualification</h2>
+              {eduFields.map((field, index) => (
+                <div key={field.id} className="p-4 border border-slate-200 rounded-xl mb-4 bg-slate-50 relative group">
+                  <button type="button" onClick={() => removeEdu(index)} className="absolute top-4 right-4 text-slate-400 hover:text-red-500">
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-3">
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">Institution</label>
+                      <input {...register(`education.${index}.institution`)} className="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">Degree / Course</label>
+                      <input {...register(`education.${index}.degree`)} className="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">Start Date</label>
+                      <input {...register(`education.${index}.startDate`)} placeholder="e.g. 2018" className="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">End Date</label>
+                      <input {...register(`education.${index}.endDate`)} placeholder="e.g. 2022" className="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white" />
+                    </div>
+                  </div>
+                </div>
+              ))}
+              <button type="button" onClick={() => appendEdu({ institution: "", degree: "", startDate: "", endDate: "" })} className="w-full py-3 border-2 border-dashed border-slate-200 rounded-xl text-slate-500 font-medium hover:bg-slate-50 hover:border-blue-300 hover:text-blue-600 transition-all flex items-center justify-center gap-2">
+                <Plus className="w-4 h-4" /> Add Education
+              </button>
+            </section>
+
+            {/* Projects */}
+            <section>
+              <h2 className="text-xl font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">Projects</h2>
+              {projFields.map((field, index) => (
+                <div key={field.id} className="p-4 border border-slate-200 rounded-xl mb-4 bg-slate-50 relative group">
+                  <button type="button" onClick={() => removeProj(index)} className="absolute top-4 right-4 text-slate-400 hover:text-red-500">
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                  <div className="grid grid-cols-1 gap-4 mb-3">
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">Project Name</label>
+                      <input {...register(`projects.${index}.name`)} className="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">Description</label>
+                      <textarea {...register(`projects.${index}.description`)} rows={3} className="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white"></textarea>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              <button type="button" onClick={() => appendProj({ name: "", description: "", technologies: [] })} className="w-full py-3 border-2 border-dashed border-slate-200 rounded-xl text-slate-500 font-medium hover:bg-slate-50 hover:border-blue-300 hover:text-blue-600 transition-all flex items-center justify-center gap-2">
+                <Plus className="w-4 h-4" /> Add Project
+              </button>
+            {/* Skills & Others */}
+            <section>
+              <h2 className="text-xl font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">Additional Information</h2>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1 flex justify-between">
+                    Skills (Comma separated)
+                  </label>
+                  <textarea {...register("skills")} rows={2} className="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white" placeholder="React, Node.js, Project Management..."></textarea>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1 flex justify-between">
+                    Certifications (Comma separated)
+                  </label>
+                  <textarea {...register("certifications")} rows={2} className="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white" placeholder="AWS Certified Developer, PMP..."></textarea>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1 flex justify-between">
+                    Hobbies & Interests (Comma separated)
+                  </label>
+                  <textarea {...register("interests")} rows={2} className="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white" placeholder="Photography, Traveling, Reading..."></textarea>
+                </div>
+              </div>
+            </section>
+
           </form>
         </div>
 
@@ -247,7 +328,7 @@ export default function Builder() {
 
             {formData.experience && formData.experience.length > 0 && (
               <div className="mb-4">
-                <h2 className="text-lg font-bold uppercase tracking-wider mb-2 text-slate-900 border-b border-slate-300">Experience</h2>
+                <h2 className="text-lg font-bold uppercase tracking-wider mb-2 text-slate-900 border-b border-slate-300">Experience & Internships</h2>
                 <div className="space-y-4">
                   {formData.experience.map((exp, i) => (
                     <div key={i}>
@@ -260,6 +341,66 @@ export default function Builder() {
                     </div>
                   ))}
                 </div>
+              </div>
+            )}
+
+            {formData.education && formData.education.length > 0 && (
+              <div className="mb-4">
+                <h2 className="text-lg font-bold uppercase tracking-wider mb-2 text-slate-900 border-b border-slate-300">Education</h2>
+                <div className="space-y-4">
+                  {formData.education.map((edu, i) => (
+                    <div key={i}>
+                      <div className="flex justify-between items-baseline mb-1">
+                        <h3 className="font-bold text-slate-900">{edu.degree}</h3>
+                        <span className="text-sm font-medium text-slate-700">{edu.startDate} - {edu.endDate}</span>
+                      </div>
+                      <div className="text-sm font-medium text-slate-700">{edu.institution}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {formData.projects && formData.projects.length > 0 && (
+              <div className="mb-4">
+                <h2 className="text-lg font-bold uppercase tracking-wider mb-2 text-slate-900 border-b border-slate-300">Projects</h2>
+                <div className="space-y-4">
+                  {formData.projects.map((proj, i) => (
+                    <div key={i}>
+                      <div className="flex justify-between items-baseline mb-1">
+                        <h3 className="font-bold text-slate-900">{proj.name}</h3>
+                      </div>
+                      <p className="text-sm leading-relaxed text-slate-800 whitespace-pre-wrap ml-4 list-disc">{proj.description}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {formData.skills && formData.skills.length > 0 && (
+              <div className="mb-4">
+                <h2 className="text-lg font-bold uppercase tracking-wider mb-2 text-slate-900 border-b border-slate-300">Skills</h2>
+                <p className="text-sm leading-relaxed text-slate-800">
+                  {typeof formData.skills === "string" ? formData.skills : formData.skills.join(", ")}
+                </p>
+              </div>
+            )}
+
+            {formData.certifications && formData.certifications.length > 0 && (
+              <div className="mb-4">
+                <h2 className="text-lg font-bold uppercase tracking-wider mb-2 text-slate-900 border-b border-slate-300">Certifications</h2>
+                <p className="text-sm leading-relaxed text-slate-800">
+                  {typeof formData.certifications === "string" ? formData.certifications : formData.certifications.join(", ")}
+                </p>
+              </div>
+            )}
+
+            {formData.interests && formData.interests.length > 0 && (
+              <div className="mb-4">
+                <h2 className="text-lg font-bold uppercase tracking-wider mb-2 text-slate-900 border-b border-slate-300">Hobbies & Interests</h2>
+                <p className="text-sm leading-relaxed text-slate-800">
+                  {typeof formData.interests === "string" ? formData.interests : formData.interests.join(", ")}
+                </p>
               </div>
             )}
           </div>
