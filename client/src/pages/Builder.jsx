@@ -277,6 +277,7 @@ export default function Builder() {
               <button type="button" onClick={() => appendProj({ name: "", description: "", technologies: [] })} className="w-full py-3 border-2 border-dashed border-slate-200 rounded-xl text-slate-500 font-medium hover:bg-slate-50 hover:border-blue-300 hover:text-blue-600 transition-all flex items-center justify-center gap-2">
                 <Plus className="w-4 h-4" /> Add Project
               </button>
+            </section>
             {/* Skills & Others */}
             <section>
               <h2 className="text-xl font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">Additional Information</h2>
