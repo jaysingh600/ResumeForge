@@ -6,7 +6,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import jwt from "jsonwebtoken";
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
-
+// open gemini api
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "dummy_key");
 
 // Middleware to authenticate
@@ -22,7 +22,7 @@ const authenticate = (req: any, res: any, next: any) => {
     res.status(401).json({ message: "Token is not valid" });
   }
 };
-
+// router parse resume
 router.post("/parse", authenticate, upload.single("resume"), async (req: any, res: any) => {
   try {
     if (!req.file) return res.status(400).json({ message: "No file uploaded" });
