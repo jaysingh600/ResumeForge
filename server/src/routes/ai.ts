@@ -2,15 +2,12 @@ import express from "express";
 import multer from "multer";
 const pdfParse = require("pdf-parse");
 import mammoth from "mammoth";
-import OpenAI from "openai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import jwt from "jsonwebtoken";
-
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY || "dummy_key",
-});
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "dummy_key");
 
 // Middleware to authenticate
 const authenticate = (req: any, res: any, next: any) => {
@@ -29,7 +26,7 @@ const authenticate = (req: any, res: any, next: any) => {
 router.post("/parse", authenticate, upload.single("resume"), async (req: any, res: any) => {
   try {
     if (!req.file) return res.status(400).json({ message: "No file uploaded" });
-    if (!process.env.OPENAI_API_KEY) {
+    if (!process.env.GEMINI_API_KEY) {
       // Return a mock parsed resume for testing purposes
       return res.json({
         personalInfo: {
@@ -41,7 +38,7 @@ router.post("/parse", authenticate, upload.single("resume"), async (req: any, re
           github: "github.com/mock",
           portfolio: ""
         },
-        summary: "This is a mocked professional summary because the OpenAI API key is missing. The system successfully read the file but used mock data for the JSON parsing.",
+        summary: "This is a mocked professional summary because the Gemini API key is missing. The system successfully read the file but used mock data for the JSON parsing.",
         skills: ["React", "Node.js", "TypeScript", "Tailwind CSS"],
         education: [
           { institution: "Mock University", degree: "B.S. Computer Science", startDate: "2018", endDate: "2022" }
@@ -70,7 +67,7 @@ router.post("/parse", authenticate, upload.single("resume"), async (req: any, re
       return res.status(400).json({ message: "Unsupported file type. Please upload PDF or DOCX." });
     }
 
-    // Call OpenAI
+    // Call Gemini
     const prompt = `Extract all possible resume details from the following text and return ONLY valid JSON matching this structure:
 {
   "personalInfo": { "fullName": "", "email": "", "phone": "", "address": "", "linkedin": "", "github": "", "portfolio": "" },
@@ -84,13 +81,12 @@ Text to extract from:
 ${extractedText}
 `;
 
-    const response = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
-      messages: [{ role: "user", content: prompt }],
-      response_format: { type: "json_object" },
-    });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const result = await model.generateContent(prompt);
+    let text = result.response.text();
+    text = text.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
 
-    const parsedData = JSON.parse(response.choices[0].message.content || "{}");
+    const parsedData = JSON.parse(text || "{}");
     res.json(parsedData);
   } catch (error) {
     console.error("Parse Error:", error);
@@ -100,7 +96,7 @@ ${extractedText}
 
 router.post("/optimize", authenticate, async (req: any, res: any) => {
   try {
-    if (!process.env.OPENAI_API_KEY) {
+    if (!process.env.GEMINI_API_KEY) {
       return res.json({ optimizedText: "[Mocked Optimization] " + req.body.content });
     }
 
@@ -115,12 +111,10 @@ router.post("/optimize", authenticate, async (req: any, res: any) => {
       return res.status(400).json({ message: "Invalid optimization type" });
     }
 
-    const response = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
-      messages: [{ role: "user", content: prompt }],
-    });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const result = await model.generateContent(prompt);
 
-    res.json({ optimizedText: response.choices[0].message.content?.trim() });
+    res.json({ optimizedText: result.response.text().trim() });
   } catch (error) {
     res.status(500).json({ message: "Failed to optimize content" });
   }
