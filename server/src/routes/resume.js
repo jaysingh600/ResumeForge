@@ -18,7 +18,7 @@ const authenticate = (req: any, res: any, next: any) => {
   }
 };
 
-// Create a new resume
+// Create a new resume according to details
 router.post("/create", authenticate, async (req: any, res: any) => {
   try {
     const resume = new Resume({
@@ -32,7 +32,7 @@ router.post("/create", authenticate, async (req: any, res: any) => {
   }
 });
 
-// Get all resumes for user
+// Get all resumes for user get
 router.get("/", authenticate, async (req: any, res: any) => {
   try {
     const resumes = await Resume.find({ userId: req.userId }).sort({ updatedAt: -1 });
