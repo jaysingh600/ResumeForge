@@ -9,7 +9,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 // open gemini api
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "dummy_key");
 
-// Middleware to authenticate
+// Middleware to authenticate 
 const authenticate = (req: any, res: any, next: any) => {
   const token = req.header("Authorization")?.replace("Bearer ", "");
   if (!token) return res.status(401).json({ message: "No token, authorization denied" });
@@ -67,7 +67,7 @@ router.post("/parse", authenticate, upload.single("resume"), async (req: any, re
       return res.status(400).json({ message: "Unsupported file type. Please upload PDF or DOCX." });
     }
 
-    // Call Gemini
+    // Call Gemini for extract
     const prompt = `Extract all possible resume details from the following text and return ONLY valid JSON matching this structure:
 {
   "personalInfo": { "fullName": "", "email": "", "phone": "", "address": "", "linkedin": "", "github": "", "portfolio": "" },
@@ -93,7 +93,7 @@ ${extractedText}
     res.status(500).json({ message: "Failed to parse resume" });
   }
 });
-
+// routes
 router.post("/optimize", authenticate, async (req: any, res: any) => {
   try {
     if (!process.env.GEMINI_API_KEY) {
