@@ -32,7 +32,7 @@ const features = [
   },
 ];
 
-function SparklesIcon(props: any) {
+function SparklesIcon(props) {
   return (
     <svg
       {...props}
