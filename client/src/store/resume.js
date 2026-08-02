@@ -1,43 +1,7 @@
 import { create } from 'zustand';
 import axios from 'axios';
 
-export interface ResumeData {
-  _id?: string;
-  title: string;
-  personalInfo: {
-    fullName: string;
-    email: string;
-    phone: string;
-    address: string;
-    linkedin: string;
-    github: string;
-    portfolio: string;
-  };
-  summary: string;
-  skills: string[];
-  education: any[];
-  experience: any[];
-  projects: any[];
-  certifications: any[];
-  achievements: string[];
-  languages: string[];
-  interests: string[];
-  template: string;
-  updatedAt?: string;
-}
-
-interface ResumeState {
-  resumes: ResumeData[];
-  currentResume: ResumeData | null;
-  isLoading: boolean;
-  error: string | null;
-  fetchResumes: (token: string) => Promise<void>;
-  setCurrentResume: (resume: ResumeData | null) => void;
-  createResume: (token: string, data: Partial<ResumeData>) => Promise<string>;
-  deleteResume: (token: string, id: string) => Promise<void>;
-}
-
-export const useResumeStore = create<ResumeState>((set) => ({
+export const useResumeStore = create((set) => ({
   resumes: [],
   currentResume: null,
   isLoading: false,
@@ -49,7 +13,7 @@ export const useResumeStore = create<ResumeState>((set) => ({
         headers: { Authorization: `Bearer ${token}` }
       });
       set({ resumes: response.data, isLoading: false });
-    } catch (err: any) {
+    } catch (err) {
       set({ error: err.message, isLoading: false });
     }
   },

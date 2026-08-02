@@ -49,7 +49,7 @@ router.get("/:id", authenticate, async (req: any, res: any) => {
     if (!resume) return res.status(404).json({ message: "Resume not found" });
     res.json(resume);
   } catch (error) {
-    res.status(500).json({ message: "Failed to fetch resume" });
+    res.status(500).json({ message: "Failed to fetch the resume" });
   }
 });
 
