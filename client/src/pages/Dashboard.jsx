@@ -41,7 +41,7 @@ export default function Dashboard() {
   const hour = new Date().getHours();
   const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
 
-  // Animation variants
+  // Animation variants use
   const containerVariants = {
     hidden: { opacity: 0 },
     show: {
@@ -49,7 +49,7 @@ export default function Dashboard() {
       transition: { staggerChildren: 0.1 }
     }
   };
-
+// Item variants
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
     show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
