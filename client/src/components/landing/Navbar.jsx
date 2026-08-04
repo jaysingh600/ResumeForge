@@ -12,7 +12,7 @@ export default function Navbar() {
           // logo
           <span className="font-bold text-xl text-slate-900 tracking-tight">ResumeForge</span>
         </Link>
-        // nav item
+        
         <div className="hidden md:flex items-center gap-8 font-medium text-sm text-slate-600">
           <a href="#features" className="hover:text-blue-600 transition-colors">Features</a>
           <a href="#how-it-works" className="hover:text-blue-600 transition-colors">How it works</a>
