@@ -57,7 +57,7 @@ export default function Dashboard() {
   const filteredResumes = resumes.filter(r => r.title?.toLowerCase().includes(searchQuery.toLowerCase()));
 
   return (
-    <div className="min-h-screen bg-slate-50 flex relative overflow-hidden font-sans">
+    <div className="h-screen bg-slate-50 flex relative overflow-hidden font-sans">
       {/* Dynamic Background Elements for Premium Feel */}
       <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-blue-500/10 blur-[120px] pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-emerald-500/10 blur-[120px] pointer-events-none" />
