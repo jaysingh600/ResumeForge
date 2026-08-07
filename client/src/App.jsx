@@ -5,6 +5,8 @@ import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import Builder from "./pages/Builder";
 import Upload from "./pages/Upload";
+import Jobs from "./pages/Jobs";
+import Profile from "./pages/Profile";
 
 function App() {
   return (
@@ -16,6 +18,8 @@ function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/builder/:id?" element={<Builder />} />
         <Route path="/upload" element={<Upload />} />
+        <Route path="/jobs" element={<Jobs />} />
+        <Route path="/profile" element={<Profile />} />
       </Routes>
     </Router>
   );

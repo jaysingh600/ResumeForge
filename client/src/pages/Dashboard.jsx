@@ -5,7 +5,7 @@ import { useResumeStore } from "../store/resume";
 import { 
   FileText, Upload, LayoutTemplate, User, Settings, LogOut, 
   Plus, MoreVertical, Trash2, Edit, Download, FileCheck2,
-  Search, Sparkles, Clock, ArrowUpRight, CheckCircle2
+  Search, Sparkles, Clock, ArrowUpRight, CheckCircle2, Briefcase
 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -33,7 +33,8 @@ export default function Dashboard() {
     { label: "Build Resume", icon: Plus, path: "/builder" },
     { label: "Upload Resume", icon: Upload, path: "/upload" },
     { label: "Templates", icon: LayoutTemplate, path: "#" },
-    { label: "Profile", icon: User, path: "#" },
+    { label: "Job Portal", icon: Briefcase, path: "/jobs" },
+    { label: "Profile", icon: User, path: "/profile" },
     { label: "Settings", icon: Settings, path: "#" },
   ];
 
