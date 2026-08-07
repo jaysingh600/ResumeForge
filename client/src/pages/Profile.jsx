@@ -50,10 +50,8 @@ export default function Profile() {
     { label: "My Resumes", icon: FileText, path: "/dashboard" },
     { label: "Build Resume", icon: Plus, path: "/builder" },
     { label: "Upload Resume", icon: Upload, path: "/upload" },
-    { label: "Templates", icon: LayoutTemplate, path: "#" },
     { label: "Job Portal", icon: Briefcase, path: "/jobs" },
     { label: "Profile", icon: User, path: "/profile", active: true },
-    { label: "Settings", icon: Settings, path: "#" },
   ];
 
   const handleChange = (e) => {
