@@ -17,6 +17,7 @@ export default function Navbar() {
           <a href="#features" className="hover:text-blue-600 transition-colors">Features</a>
           <a href="#how-it-works" className="hover:text-blue-600 transition-colors">How it works</a>
           <a href="#templates" className="hover:text-blue-600 transition-colors">Templates</a>
+          <Link to="/jobs" className="hover:text-blue-600 transition-colors font-semibold text-slate-800">Job Portal</Link>
         </div>
 
         <div className="flex items-center gap-4">
