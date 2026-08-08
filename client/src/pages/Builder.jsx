@@ -309,53 +309,54 @@ export default function Builder() {
         {/* Right Pane - Live Preview */}
         <div className="hidden lg:flex w-[55%] h-full bg-slate-200 p-8 overflow-y-auto justify-center">
           {/* A4 Size Paper Simulation */}
-          <div id="resume-preview" className="w-[794px] min-h-[1123px] bg-white shadow-2xl shrink-0 p-[40px] text-slate-900 font-sans">
-            <div className="border-b-2 border-slate-900 pb-4 mb-4 text-center">
-              <h1 className="text-3xl font-bold uppercase tracking-wider">{formData.personalInfo?.fullName || "YOUR NAME"}</h1>
-              <div className="flex flex-wrap justify-center gap-3 text-sm mt-2 text-slate-700">
-                {formData.personalInfo?.email && <span>{formData.personalInfo.email}</span>}
-                {formData.personalInfo?.phone && <span>• {formData.personalInfo.phone}</span>}
-                {formData.personalInfo?.address && <span>• {formData.personalInfo.address}</span>}
-                {formData.personalInfo?.linkedin && <span>• {formData.personalInfo.linkedin}</span>}
+          <div id="resume-preview" className="w-[794px] min-h-[1123px] bg-white shadow-2xl shrink-0 p-[40px] text-black font-serif">
+            <div className="text-center mb-4">
+              <h1 className="text-2xl font-bold">{formData.personalInfo?.fullName || "YOUR NAME"}</h1>
+              <div className="flex flex-wrap justify-center gap-1 text-[13px] mt-1">
+                {formData.personalInfo?.phone && <span>{formData.personalInfo.phone}</span>}
+                {formData.personalInfo?.email && <span> | {formData.personalInfo.email}</span>}
+                {formData.personalInfo?.address && <span> | {formData.personalInfo.address}</span>}
+              </div>
+              <div className="flex flex-wrap justify-center gap-1 text-[13px]">
+                {formData.personalInfo?.linkedin && <span><a href={formData.personalInfo.linkedin} className="text-blue-600 underline">LinkedIn</a></span>}
+                {formData.personalInfo?.github && <span> | <a href={formData.personalInfo.github} className="text-blue-600 underline">GitHub</a></span>}
+                {formData.personalInfo?.portfolio && <span> | <a href={formData.personalInfo.portfolio} className="text-blue-600 underline">Portfolio</a></span>}
               </div>
             </div>
 
             {formData.summary && (
-              <div className="mb-4">
-                <h2 className="text-lg font-bold uppercase tracking-wider mb-2 text-slate-900 border-b border-slate-300">Professional Summary</h2>
-                <p className="text-sm leading-relaxed text-slate-800 whitespace-pre-wrap">{formData.summary}</p>
-              </div>
-            )}
-
-            {formData.experience && formData.experience.length > 0 && (
-              <div className="mb-4">
-                <h2 className="text-lg font-bold uppercase tracking-wider mb-2 text-slate-900 border-b border-slate-300">Experience & Internships</h2>
-                <div className="space-y-4">
-                  {formData.experience.map((exp, i) => (
-                    <div key={i}>
-                      <div className="flex justify-between items-baseline mb-1">
-                        <h3 className="font-bold text-slate-900">{exp.position}</h3>
-                        <span className="text-sm font-medium text-slate-700">{exp.startDate} - {exp.endDate}</span>
-                      </div>
-                      <div className="text-sm font-medium text-slate-700 mb-1">{exp.company}</div>
-                      <p className="text-sm leading-relaxed text-slate-800 whitespace-pre-wrap ml-4 list-disc">{exp.description}</p>
-                    </div>
-                  ))}
-                </div>
+              <div className="mb-3">
+                <h2 className="text-[15px] font-bold mb-1 border-b-[1.5px] border-black">Career Objective</h2>
+                <p className="text-[13px] leading-tight whitespace-pre-wrap">{formData.summary}</p>
               </div>
             )}
 
             {formData.education && formData.education.length > 0 && (
-              <div className="mb-4">
-                <h2 className="text-lg font-bold uppercase tracking-wider mb-2 text-slate-900 border-b border-slate-300">Education</h2>
-                <div className="space-y-4">
+              <div className="mb-3">
+                <h2 className="text-[15px] font-bold mb-1 border-b-[1.5px] border-black">Education</h2>
+                <ul className="list-disc ml-5 space-y-1">
                   {formData.education.map((edu, i) => (
+                    <li key={i} className="text-[13px] leading-tight">
+                      <span className="font-bold">{edu.degree}</span> {edu.institution} | {edu.startDate} - {edu.endDate}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {formData.experience && formData.experience.length > 0 && (
+              <div className="mb-3">
+                <h2 className="text-[15px] font-bold mb-1 border-b-[1.5px] border-black">Internship & Experience</h2>
+                <div className="space-y-3">
+                  {formData.experience.map((exp, i) => (
                     <div key={i}>
-                      <div className="flex justify-between items-baseline mb-1">
-                        <h3 className="font-bold text-slate-900">{edu.degree}</h3>
-                        <span className="text-sm font-medium text-slate-700">{edu.startDate} - {edu.endDate}</span>
+                      <div className="flex justify-between items-baseline mb-1 text-[13px]">
+                        <div>
+                          <span className="font-bold">{exp.position}</span> | {exp.company}
+                        </div>
+                        <span>{exp.startDate} – {exp.endDate}</span>
                       </div>
-                      <div className="text-sm font-medium text-slate-700">{edu.institution}</div>
+                      <p className="text-[13px] leading-tight whitespace-pre-wrap">{exp.description}</p>
                     </div>
                   ))}
                 </div>
@@ -363,15 +364,15 @@ export default function Builder() {
             )}
 
             {formData.projects && formData.projects.length > 0 && (
-              <div className="mb-4">
-                <h2 className="text-lg font-bold uppercase tracking-wider mb-2 text-slate-900 border-b border-slate-300">Projects</h2>
-                <div className="space-y-4">
+              <div className="mb-3">
+                <h2 className="text-[15px] font-bold mb-1 border-b-[1.5px] border-black">Academic Projects</h2>
+                <div className="space-y-3">
                   {formData.projects.map((proj, i) => (
                     <div key={i}>
-                      <div className="flex justify-between items-baseline mb-1">
-                        <h3 className="font-bold text-slate-900">{proj.name}</h3>
+                      <div className="flex justify-between items-baseline mb-1 text-[13px]">
+                        <span className="font-bold">{proj.name}</span>
                       </div>
-                      <p className="text-sm leading-relaxed text-slate-800 whitespace-pre-wrap ml-4 list-disc">{proj.description}</p>
+                      <p className="text-[13px] leading-tight whitespace-pre-wrap">{proj.description}</p>
                     </div>
                   ))}
                 </div>
@@ -379,27 +380,27 @@ export default function Builder() {
             )}
 
             {formData.skills && formData.skills.length > 0 && (
-              <div className="mb-4">
-                <h2 className="text-lg font-bold uppercase tracking-wider mb-2 text-slate-900 border-b border-slate-300">Skills</h2>
-                <p className="text-sm leading-relaxed text-slate-800">
+              <div className="mb-3">
+                <h2 className="text-[15px] font-bold mb-1 border-b-[1.5px] border-black">Technical Skills</h2>
+                <p className="text-[13px] leading-tight whitespace-pre-wrap ml-4 list-disc" style={{ display: 'list-item' }}>
                   {typeof formData.skills === "string" ? formData.skills : formData.skills.join(", ")}
                 </p>
               </div>
             )}
 
             {formData.certifications && formData.certifications.length > 0 && (
-              <div className="mb-4">
-                <h2 className="text-lg font-bold uppercase tracking-wider mb-2 text-slate-900 border-b border-slate-300">Certifications</h2>
-                <p className="text-sm leading-relaxed text-slate-800">
+              <div className="mb-3">
+                <h2 className="text-[15px] font-bold mb-1 border-b-[1.5px] border-black">Certifications</h2>
+                <p className="text-[13px] leading-tight whitespace-pre-wrap ml-4 list-disc" style={{ display: 'list-item' }}>
                   {typeof formData.certifications === "string" ? formData.certifications : formData.certifications.join(", ")}
                 </p>
               </div>
             )}
 
             {formData.interests && formData.interests.length > 0 && (
-              <div className="mb-4">
-                <h2 className="text-lg font-bold uppercase tracking-wider mb-2 text-slate-900 border-b border-slate-300">Hobbies & Interests</h2>
-                <p className="text-sm leading-relaxed text-slate-800">
+              <div className="mb-3">
+                <h2 className="text-[15px] font-bold mb-1 border-b-[1.5px] border-black">Hobbies & Interests</h2>
+                <p className="text-[13px] leading-tight whitespace-pre-wrap ml-4 list-disc" style={{ display: 'list-item' }}>
                   {typeof formData.interests === "string" ? formData.interests : formData.interests.join(", ")}
                 </p>
               </div>
