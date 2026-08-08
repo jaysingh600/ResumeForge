@@ -182,12 +182,41 @@ export default function Profile() {
                 </div>
               </div>
               {!isEditing && (
-                <button 
-                  onClick={() => setIsEditing(true)}
-                  className="px-6 py-3 bg-slate-900 text-white rounded-xl font-bold hover:bg-blue-600 transition-colors shadow-lg hover:shadow-blue-600/30"
-                >
-                  Edit Profile
-                </button>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <button 
+                    onClick={() => setIsEditing(true)}
+                    className="px-6 py-3 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-800 transition-colors shadow-lg hover:shadow-slate-900/30 whitespace-nowrap"
+                  >
+                    Edit Profile
+                  </button>
+                  <button 
+                    onClick={() => {
+                      const resumeData = {
+                        personalInfo: {
+                          fullName: user?.name || "",
+                          email: user?.email || "",
+                          phone: user?.phone || "",
+                          address: user?.location || "",
+                          linkedin: "",
+                          github: "",
+                          portfolio: ""
+                        },
+                        summary: user?.bio || "",
+                        education: user?.academics ? [{
+                          institution: user.academics,
+                          degree: "",
+                          startDate: "",
+                          endDate: ""
+                        }] : []
+                      };
+                      localStorage.setItem("resume_parsed_data", JSON.stringify(resumeData));
+                      navigate("/builder");
+                    }}
+                    className="px-6 py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-colors shadow-lg hover:shadow-blue-600/30 flex items-center justify-center gap-2 whitespace-nowrap"
+                  >
+                    <FileText className="w-5 h-5" /> Generate Resume
+                  </button>
+                </div>
               )}
             </div>
 

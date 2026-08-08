@@ -5,7 +5,7 @@ import { useAuthStore } from "../store/auth";
 import { useResumeStore } from "../store/resume";
 import { 
   Briefcase, Search, MapPin, DollarSign, Clock, Building2, 
-  Sparkles, CheckCircle2, ChevronRight, X, FileText, ArrowRight, Home
+  Sparkles, CheckCircle2, ChevronRight, X, FileText, ArrowRight, Home, Upload, Plus
 } from "lucide-react";
 import Navbar from "../components/landing/Navbar";
 
@@ -100,6 +100,7 @@ export default function Jobs() {
   const [selectedJob, setSelectedJob] = useState(null);
   const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
   const [selectedResumeId, setSelectedResumeId] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
   const [isApplying, setIsApplying] = useState(false);
   const [applicationSuccess, setApplicationSuccess] = useState(false);
 
@@ -125,10 +126,18 @@ export default function Jobs() {
     setIsApplyModalOpen(true);
     setApplicationSuccess(false);
     setSelectedResumeId(null);
+    setSelectedFile(null);
+  };
+
+  const handleFileChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setSelectedFile(e.target.files[0]);
+      setSelectedResumeId(null); // Clear selected app resume
+    }
   };
 
   const submitApplication = () => {
-    if (!selectedResumeId) return;
+    if (!selectedResumeId && !selectedFile) return;
     
     setIsApplying(true);
     // Simulate API call
@@ -141,6 +150,7 @@ export default function Jobs() {
         setIsApplyModalOpen(false);
         setApplicationSuccess(false);
         setSelectedJob(null);
+        setSelectedFile(null);
       }, 3000);
     }, 1500);
   };
@@ -368,42 +378,78 @@ export default function Jobs() {
                         <div className="w-8 h-8 border-4 border-slate-200 border-t-blue-600 rounded-full animate-spin" />
                       </div>
                     ) : resumes.length === 0 ? (
-                      <div className="text-center py-12 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200">
+                      <div className="text-center py-8 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200">
                         <FileText className="w-12 h-12 text-slate-300 mx-auto mb-3" />
                         <p className="text-slate-900 font-bold mb-1">No resumes found</p>
-                        <p className="text-slate-500 text-sm mb-4">You need to create a resume first.</p>
-                        <Link 
-                          to="/builder" 
-                          className="inline-flex items-center justify-center px-6 py-2.5 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-colors"
-                        >
-                          Create Resume
-                        </Link>
+                        
+                        <label className={`mt-4 inline-flex flex-col items-center justify-center p-6 border-2 border-dashed rounded-xl cursor-pointer transition-all bg-white ${selectedFile ? 'border-blue-600 bg-blue-50' : 'border-slate-300 hover:border-blue-400 hover:bg-slate-50'}`}>
+                          <Upload className={`w-8 h-8 mb-2 ${selectedFile ? 'text-blue-600' : 'text-slate-400'}`} />
+                          <span className="font-bold text-slate-700 text-center">
+                            {selectedFile ? selectedFile.name : 'Upload Resume (PDF)'}
+                          </span>
+                          <input type="file" accept=".pdf" className="hidden" onChange={handleFileChange} />
+                        </label>
+                        
+                        <div className="mt-4">
+                           <Link to="/builder" className="text-sm font-bold text-blue-600 hover:text-blue-700 flex items-center justify-center gap-1">
+                             <Plus className="w-4 h-4" /> Or create a new resume
+                           </Link>
+                        </div>
                       </div>
                     ) : (
-                      <div className="space-y-3">
-                        {resumes.map(resume => (
-                          <label 
-                            key={resume._id} 
-                            className={`flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                              selectedResumeId === resume._id 
-                                ? 'border-blue-600 bg-blue-50' 
-                                : 'border-slate-200 hover:border-blue-200 hover:bg-slate-50'
-                            }`}
-                          >
-                            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                              selectedResumeId === resume._id ? 'border-blue-600' : 'border-slate-300'
-                            }`}>
-                              {selectedResumeId === resume._id && <div className="w-2.5 h-2.5 bg-blue-600 rounded-full" />}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="font-bold text-slate-900 truncate">{resume.title || 'Untitled Resume'}</p>
-                              <p className="text-xs text-slate-500">Updated {new Date(resume.updatedAt).toLocaleDateString()}</p>
-                            </div>
-                            <div className="text-xs font-bold text-slate-400 bg-white px-2 py-1 rounded-md border border-slate-100">
-                              {resume.template || 'Standard'}
-                            </div>
-                          </label>
-                        ))}
+                      <div className="space-y-4">
+                        <div className="space-y-3">
+                          {resumes.map(resume => (
+                            <label 
+                              key={resume._id} 
+                              className={`flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                                selectedResumeId === resume._id 
+                                  ? 'border-blue-600 bg-blue-50' 
+                                  : 'border-slate-200 hover:border-blue-200 hover:bg-slate-50'
+                              }`}
+                            >
+                              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                                selectedResumeId === resume._id ? 'border-blue-600' : 'border-slate-300'
+                              }`}>
+                                {selectedResumeId === resume._id && <div className="w-2.5 h-2.5 bg-blue-600 rounded-full" />}
+                                <input type="radio" name="resume" className="hidden" onChange={() => { setSelectedResumeId(resume._id); setSelectedFile(null); }} />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="font-bold text-slate-900 truncate">{resume.title || 'Untitled Resume'}</p>
+                                <p className="text-xs text-slate-500">Updated {new Date(resume.updatedAt).toLocaleDateString()}</p>
+                              </div>
+                              <div className="text-xs font-bold text-slate-400 bg-white px-2 py-1 rounded-md border border-slate-100">
+                                {resume.template || 'Standard'}
+                              </div>
+                            </label>
+                          ))}
+                        </div>
+
+                        <div className="relative">
+                          <div className="absolute inset-0 flex items-center">
+                            <div className="w-full border-t border-slate-200"></div>
+                          </div>
+                          <div className="relative flex justify-center text-sm">
+                            <span className="px-2 bg-white text-slate-500 font-medium">Or</span>
+                          </div>
+                        </div>
+
+                        <label className={`flex flex-col items-center justify-center p-6 border-2 border-dashed rounded-xl cursor-pointer transition-all bg-white ${selectedFile ? 'border-blue-600 bg-blue-50' : 'border-slate-300 hover:border-blue-400 hover:bg-slate-50'}`}>
+                          <Upload className={`w-8 h-8 mb-2 ${selectedFile ? 'text-blue-600' : 'text-slate-400'}`} />
+                          <span className="font-bold text-slate-700 text-center">
+                            {selectedFile ? selectedFile.name : 'Upload Resume (PDF)'}
+                          </span>
+                          <span className="text-sm text-slate-500 mt-1">
+                            {selectedFile ? 'Click to change file' : 'Browse files from your computer'}
+                          </span>
+                          <input type="file" accept=".pdf" className="hidden" onChange={handleFileChange} />
+                        </label>
+
+                        <div className="flex justify-center mt-2">
+                          <Link to="/builder" className="text-sm font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1">
+                            <Plus className="w-4 h-4" /> Create a new resume instead
+                          </Link>
+                        </div>
                       </div>
                     )}
                   </div>
