@@ -9,7 +9,7 @@ Currently, two official plugins are available:
 
 ## React Compiler
 ## resume forge website
-## In this website we generate Ats free resume based on user details and you can download
+## In this website we generate Ats free resume based on user details and you can download and apply job
 The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
 ## Expanding the Oxlint configuration
