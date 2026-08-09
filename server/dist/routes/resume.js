@@ -21,7 +21,7 @@ const authenticate = (req, res, next) => {
         res.status(401).json({ message: "Token is not valid" });
     }
 };
-// Create a new resume
+// Create a new resume according to details
 router.post("/create", authenticate, async (req, res) => {
     try {
         const resume = new Resume_1.Resume({
@@ -35,7 +35,7 @@ router.post("/create", authenticate, async (req, res) => {
         res.status(500).json({ message: "Failed to create resume" });
     }
 });
-// Get all resumes for user
+// Get all resumes for user get
 router.get("/", authenticate, async (req, res) => {
     try {
         const resumes = await Resume_1.Resume.find({ userId: req.userId }).sort({ updatedAt: -1 });
@@ -54,7 +54,7 @@ router.get("/:id", authenticate, async (req, res) => {
         res.json(resume);
     }
     catch (error) {
-        res.status(500).json({ message: "Failed to fetch resume" });
+        res.status(500).json({ message: "Failed to fetch the resume" });
     }
 });
 // Update resume

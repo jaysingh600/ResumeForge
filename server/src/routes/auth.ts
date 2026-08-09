@@ -29,7 +29,16 @@ router.post("/register", async (req, res) => {
       phone: user.phone,
       academics: user.academics,
       location: user.location,
-      bio: user.bio
+      bio: user.bio,
+      linkedin: user.linkedin,
+      github: user.github,
+      portfolio: user.portfolio,
+      skills: user.skills,
+      certifications: user.certifications,
+      interests: user.interests,
+      education: user.education,
+      experience: user.experience,
+      projects: user.projects
     } });
   } catch (error) {
     res.status(500).json({ message: "Server error during registration" });
@@ -62,19 +71,28 @@ router.post("/login", async (req, res) => {
       phone: user.phone,
       academics: user.academics,
       location: user.location,
-      bio: user.bio
+      bio: user.bio,
+      linkedin: user.linkedin,
+      github: user.github,
+      portfolio: user.portfolio,
+      skills: user.skills,
+      certifications: user.certifications,
+      interests: user.interests,
+      education: user.education,
+      experience: user.experience,
+      projects: user.projects
     } });
   } catch (error) {
     res.status(500).json({ message: "Server error during login" });
   }
 });
 
-const authenticate = (req, res, next) => {
+const authenticate = (req: any, res: any, next: any) => {
   const token = req.header("Authorization")?.replace("Bearer ", "");
   if (!token) return res.status(401).json({ message: "No token, authorization denied" });
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || "fallback_secret");
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || "fallback_secret") as any;
     req.userId = decoded.userId;
     next();
   } catch (error) {
@@ -82,10 +100,10 @@ const authenticate = (req, res, next) => {
   }
 };
 
-router.put("/profile", authenticate, async (req, res) => {
+router.put("/profile", authenticate, async (req: any, res: any) => {
   try {
-    const { name, phone, academics, location, bio } = req.body;
-    const user = await User.findById(req.userId);
+    const { name, phone, academics, location, bio, linkedin, github, portfolio, skills, certifications, interests, education, experience, projects } = req.body;
+    const user = await User.findById((req as any).userId);
     
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -96,6 +114,15 @@ router.put("/profile", authenticate, async (req, res) => {
     if (academics !== undefined) user.academics = academics;
     if (location !== undefined) user.location = location;
     if (bio !== undefined) user.bio = bio;
+    if (linkedin !== undefined) user.linkedin = linkedin;
+    if (github !== undefined) user.github = github;
+    if (portfolio !== undefined) user.portfolio = portfolio;
+    if (skills !== undefined) user.skills = skills;
+    if (certifications !== undefined) user.certifications = certifications;
+    if (interests !== undefined) user.interests = interests;
+    if (education !== undefined) user.education = education;
+    if (experience !== undefined) user.experience = experience;
+    if (projects !== undefined) user.projects = projects;
 
     await user.save();
 
@@ -108,7 +135,16 @@ router.put("/profile", authenticate, async (req, res) => {
         phone: user.phone,
         academics: user.academics,
         location: user.location,
-        bio: user.bio
+        bio: user.bio,
+        linkedin: user.linkedin,
+        github: user.github,
+        portfolio: user.portfolio,
+        skills: user.skills,
+        certifications: user.certifications,
+        interests: user.interests,
+        education: user.education,
+        experience: user.experience,
+        projects: user.projects
       }
     });
   } catch (error) {

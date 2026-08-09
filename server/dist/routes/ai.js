@@ -11,8 +11,9 @@ const generative_ai_1 = require("@google/generative-ai");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const router = express_1.default.Router();
 const upload = (0, multer_1.default)({ storage: multer_1.default.memoryStorage() });
+// open gemini api
 const genAI = new generative_ai_1.GoogleGenerativeAI(process.env.GEMINI_API_KEY || "dummy_key");
-// Middleware to authenticate
+// Middleware to authenticate 
 const authenticate = (req, res, next) => {
     const token = req.header("Authorization")?.replace("Bearer ", "");
     if (!token)
@@ -26,6 +27,7 @@ const authenticate = (req, res, next) => {
         res.status(401).json({ message: "Token is not valid" });
     }
 };
+// router parse resume
 router.post("/parse", authenticate, upload.single("resume"), async (req, res) => {
     try {
         if (!req.file)
@@ -68,7 +70,7 @@ router.post("/parse", authenticate, upload.single("resume"), async (req, res) =>
         else {
             return res.status(400).json({ message: "Unsupported file type. Please upload PDF or DOCX." });
         }
-        // Call Gemini
+        // Call Gemini for extract
         const prompt = `Extract all possible resume details from the following text and return ONLY valid JSON matching this structure:
 {
   "personalInfo": { "fullName": "", "email": "", "phone": "", "address": "", "linkedin": "", "github": "", "portfolio": "" },
@@ -93,6 +95,7 @@ ${extractedText}
         res.status(500).json({ message: "Failed to parse resume" });
     }
 });
+// routes
 router.post("/optimize", authenticate, async (req, res) => {
     try {
         if (!process.env.GEMINI_API_KEY) {

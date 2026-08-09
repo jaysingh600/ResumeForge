@@ -21,7 +21,24 @@ router.post("/register", async (req, res) => {
         const token = jsonwebtoken_1.default.sign({ userId: user._id }, process.env.JWT_SECRET || "fallback_secret", {
             expiresIn: "7d",
         });
-        res.status(201).json({ token, user: { id: user._id, name: user.name, email: user.email } });
+        res.status(201).json({ token, user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                phone: user.phone,
+                academics: user.academics,
+                location: user.location,
+                bio: user.bio,
+                linkedin: user.linkedin,
+                github: user.github,
+                portfolio: user.portfolio,
+                skills: user.skills,
+                certifications: user.certifications,
+                interests: user.interests,
+                education: user.education,
+                experience: user.experience,
+                projects: user.projects
+            } });
     }
     catch (error) {
         res.status(500).json({ message: "Server error during registration" });
@@ -41,10 +58,104 @@ router.post("/login", async (req, res) => {
         const token = jsonwebtoken_1.default.sign({ userId: user._id }, process.env.JWT_SECRET || "fallback_secret", {
             expiresIn: "7d",
         });
-        res.json({ token, user: { id: user._id, name: user.name, email: user.email, avatar: user.avatar } });
+        res.json({ token, user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                avatar: user.avatar,
+                phone: user.phone,
+                academics: user.academics,
+                location: user.location,
+                bio: user.bio,
+                linkedin: user.linkedin,
+                github: user.github,
+                portfolio: user.portfolio,
+                skills: user.skills,
+                certifications: user.certifications,
+                interests: user.interests,
+                education: user.education,
+                experience: user.experience,
+                projects: user.projects
+            } });
     }
     catch (error) {
         res.status(500).json({ message: "Server error during login" });
+    }
+});
+const authenticate = (req, res, next) => {
+    const token = req.header("Authorization")?.replace("Bearer ", "");
+    if (!token)
+        return res.status(401).json({ message: "No token, authorization denied" });
+    try {
+        const decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET || "fallback_secret");
+        req.userId = decoded.userId;
+        next();
+    }
+    catch (error) {
+        res.status(401).json({ message: "Token is not valid" });
+    }
+};
+router.put("/profile", authenticate, async (req, res) => {
+    try {
+        const { name, phone, academics, location, bio, linkedin, github, portfolio, skills, certifications, interests, education, experience, projects } = req.body;
+        const user = await User_1.User.findById(req.userId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        if (name)
+            user.name = name;
+        if (phone !== undefined)
+            user.phone = phone;
+        if (academics !== undefined)
+            user.academics = academics;
+        if (location !== undefined)
+            user.location = location;
+        if (bio !== undefined)
+            user.bio = bio;
+        if (linkedin !== undefined)
+            user.linkedin = linkedin;
+        if (github !== undefined)
+            user.github = github;
+        if (portfolio !== undefined)
+            user.portfolio = portfolio;
+        if (skills !== undefined)
+            user.skills = skills;
+        if (certifications !== undefined)
+            user.certifications = certifications;
+        if (interests !== undefined)
+            user.interests = interests;
+        if (education !== undefined)
+            user.education = education;
+        if (experience !== undefined)
+            user.experience = experience;
+        if (projects !== undefined)
+            user.projects = projects;
+        await user.save();
+        res.json({
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                avatar: user.avatar,
+                phone: user.phone,
+                academics: user.academics,
+                location: user.location,
+                bio: user.bio,
+                linkedin: user.linkedin,
+                github: user.github,
+                portfolio: user.portfolio,
+                skills: user.skills,
+                certifications: user.certifications,
+                interests: user.interests,
+                education: user.education,
+                experience: user.experience,
+                projects: user.projects
+            }
+        });
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Server error updating profile" });
     }
 });
 exports.default = router;

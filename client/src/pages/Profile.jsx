@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useForm, useFieldArray } from "react-hook-form";
 import { useAuthStore } from "../store/auth";
 import { 
   FileText, Upload, LayoutTemplate, User, Settings, LogOut, 
   Plus, Sparkles, CheckCircle2, Phone, MapPin, GraduationCap, 
-  Briefcase, Save, Loader2, BookOpen
+  Briefcase, Save, Loader2, BookOpen, Trash2
 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -17,13 +18,28 @@ export default function Profile() {
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
 
-  const [formData, setFormData] = useState({
-    name: "",
-    phone: "",
-    location: "",
-    academics: "",
-    bio: "",
+  const { register, control, handleSubmit, reset } = useForm({
+    defaultValues: {
+      name: "",
+      phone: "",
+      location: "",
+      academics: "",
+      bio: "",
+      linkedin: "",
+      github: "",
+      portfolio: "",
+      skills: "",
+      certifications: "",
+      interests: "",
+      education: [],
+      experience: [],
+      projects: []
+    }
   });
+
+  const { fields: expFields, append: appendExp, remove: removeExp } = useFieldArray({ control, name: "experience" });
+  const { fields: eduFields, append: appendEdu, remove: removeEdu } = useFieldArray({ control, name: "education" });
+  const { fields: projFields, append: appendProj, remove: removeProj } = useFieldArray({ control, name: "projects" });
 
   useEffect(() => {
     if (!token) {
@@ -31,15 +47,24 @@ export default function Profile() {
       return;
     }
     if (user) {
-      setFormData({
+      reset({
         name: user.name || "",
         phone: user.phone || "",
         location: user.location || "",
         academics: user.academics || "",
         bio: user.bio || "",
+        linkedin: user.linkedin || "",
+        github: user.github || "",
+        portfolio: user.portfolio || "",
+        skills: user.skills || "",
+        certifications: user.certifications || "",
+        interests: user.interests || "",
+        education: user.education || [],
+        experience: user.experience || [],
+        projects: user.projects || []
       });
     }
-  }, [token, user, navigate]);
+  }, [token, user, navigate, reset]);
 
   const handleLogout = () => {
     logout();
@@ -54,18 +79,13 @@ export default function Profile() {
     { label: "Profile", icon: User, path: "/profile", active: true },
   ];
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const onSubmit = async (data) => {
     setIsSaving(true);
     setSuccessMsg("");
     setErrorMsg("");
     
     try {
-      await updateProfile(formData, token);
+      await updateProfile(data, token);
       setSuccessMsg("Profile updated successfully!");
       setIsEditing(false);
       setTimeout(() => setSuccessMsg(""), 3000);
@@ -74,6 +94,35 @@ export default function Profile() {
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const handleGenerateResume = () => {
+    // Collect from current user object, which holds latest saved state
+    const resumeData = {
+      personalInfo: {
+        fullName: user?.name || "",
+        email: user?.email || "",
+        phone: user?.phone || "",
+        address: user?.location || "",
+        linkedin: user?.linkedin || "",
+        github: user?.github || "",
+        portfolio: user?.portfolio || ""
+      },
+      summary: user?.bio || "",
+      education: user?.education?.length > 0 ? user.education : (user?.academics ? [{
+        institution: user.academics,
+        degree: "",
+        startDate: "",
+        endDate: ""
+      }] : []),
+      experience: user?.experience || [],
+      projects: user?.projects || [],
+      skills: user?.skills || "",
+      certifications: user?.certifications || "",
+      interests: user?.interests || ""
+    };
+    localStorage.setItem("resume_parsed_data", JSON.stringify(resumeData));
+    navigate("/builder");
   };
 
   return (
@@ -136,12 +185,12 @@ export default function Profile() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-auto z-10 relative">
+      <main className="flex-1 overflow-auto z-10 relative pb-32">
         <header className="sticky top-0 z-20 bg-slate-50/80 backdrop-blur-lg border-b border-slate-200/50 px-10 py-6">
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
             Your Profile
           </h1>
-          <p className="text-slate-500 mt-1 font-medium">Manage your personal details and professional background.</p>
+          <p className="text-slate-500 mt-1 font-medium">Manage your master resume details and professional background.</p>
         </header>
 
         <div className="p-10 max-w-4xl mx-auto">
@@ -187,31 +236,10 @@ export default function Profile() {
                     onClick={() => setIsEditing(true)}
                     className="px-6 py-3 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-800 transition-colors shadow-lg hover:shadow-slate-900/30 whitespace-nowrap"
                   >
-                    Edit Profile
+                    Edit Master Profile
                   </button>
                   <button 
-                    onClick={() => {
-                      const resumeData = {
-                        personalInfo: {
-                          fullName: user?.name || "",
-                          email: user?.email || "",
-                          phone: user?.phone || "",
-                          address: user?.location || "",
-                          linkedin: "",
-                          github: "",
-                          portfolio: ""
-                        },
-                        summary: user?.bio || "",
-                        education: user?.academics ? [{
-                          institution: user.academics,
-                          degree: "",
-                          startDate: "",
-                          endDate: ""
-                        }] : []
-                      };
-                      localStorage.setItem("resume_parsed_data", JSON.stringify(resumeData));
-                      navigate("/builder");
-                    }}
+                    onClick={handleGenerateResume}
                     className="px-6 py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-colors shadow-lg hover:shadow-blue-600/30 flex items-center justify-center gap-2 whitespace-nowrap"
                   >
                     <FileText className="w-5 h-5" /> Generate Resume
@@ -220,132 +248,178 @@ export default function Profile() {
               )}
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {/* Full Name */}
-                <div>
-                  <label className="block text-sm font-bold text-slate-700 mb-2">Full Name</label>
-                  <div className="relative group">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                      <User className="h-5 w-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
-                    </div>
-                    <input
-                      type="text"
-                      name="name"
-                      disabled={!isEditing}
-                      value={formData.name}
-                      onChange={handleChange}
-                      className="block w-full pl-11 pr-4 py-3.5 bg-slate-50/50 border border-slate-200 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 rounded-xl text-slate-900 font-medium disabled:opacity-70 disabled:cursor-not-allowed transition-all"
-                    />
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-12">
+              
+              {/* Basic Information */}
+              <section>
+                <h2 className="text-xl font-bold text-slate-900 mb-6 border-b border-slate-100 pb-2">Basic Information</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div>
+                    <label className="block text-sm font-bold text-slate-700 mb-2">Full Name</label>
+                    <input disabled={!isEditing} {...register("name")} className="block w-full px-4 py-3.5 bg-slate-50/50 border border-slate-200 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 rounded-xl text-slate-900 font-medium disabled:opacity-70 disabled:cursor-not-allowed transition-all" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-slate-700 mb-2">Email Address</label>
+                    <input type="email" value={user?.email || ""} disabled className="block w-full px-4 py-3.5 bg-slate-100 border border-slate-200 rounded-xl text-slate-500 font-medium cursor-not-allowed" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-slate-700 mb-2">Phone Number</label>
+                    <input disabled={!isEditing} {...register("phone")} className="block w-full px-4 py-3.5 bg-slate-50/50 border border-slate-200 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 rounded-xl text-slate-900 font-medium disabled:opacity-70 disabled:cursor-not-allowed transition-all" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-slate-700 mb-2">Location</label>
+                    <input disabled={!isEditing} {...register("location")} className="block w-full px-4 py-3.5 bg-slate-50/50 border border-slate-200 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 rounded-xl text-slate-900 font-medium disabled:opacity-70 disabled:cursor-not-allowed transition-all" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-slate-700 mb-2">LinkedIn URL</label>
+                    <input disabled={!isEditing} {...register("linkedin")} className="block w-full px-4 py-3.5 bg-slate-50/50 border border-slate-200 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 rounded-xl text-slate-900 font-medium disabled:opacity-70 disabled:cursor-not-allowed transition-all" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-slate-700 mb-2">GitHub URL</label>
+                    <input disabled={!isEditing} {...register("github")} className="block w-full px-4 py-3.5 bg-slate-50/50 border border-slate-200 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 rounded-xl text-slate-900 font-medium disabled:opacity-70 disabled:cursor-not-allowed transition-all" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-slate-700 mb-2">Portfolio URL</label>
+                    <input disabled={!isEditing} {...register("portfolio")} className="block w-full px-4 py-3.5 bg-slate-50/50 border border-slate-200 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 rounded-xl text-slate-900 font-medium disabled:opacity-70 disabled:cursor-not-allowed transition-all" />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-bold text-slate-700 mb-2">Professional Summary</label>
+                    <textarea disabled={!isEditing} {...register("bio")} rows={4} className="block w-full px-4 py-3.5 bg-slate-50/50 border border-slate-200 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 rounded-xl text-slate-900 font-medium disabled:opacity-70 disabled:cursor-not-allowed transition-all resize-none" />
                   </div>
                 </div>
+              </section>
 
-                {/* Email Address (Disabled) */}
-                <div>
-                  <label className="block text-sm font-bold text-slate-700 mb-2">Email Address</label>
-                  <div className="relative group">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                      <FileText className="h-5 w-5 text-slate-400" />
+              {/* Experience */}
+              <section>
+                <h2 className="text-xl font-bold text-slate-900 mb-6 border-b border-slate-100 pb-2">Experience & Internships</h2>
+                {expFields.map((field, index) => (
+                  <div key={field.id} className="p-6 border border-slate-200 rounded-xl mb-4 bg-slate-50 relative group">
+                    {isEditing && (
+                      <button type="button" onClick={() => removeExp(index)} className="absolute top-4 right-4 text-slate-400 hover:text-red-500">
+                        <Trash2 className="w-5 h-5" />
+                      </button>
+                    )}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                      <div>
+                        <label className="block text-sm font-bold text-slate-700 mb-2">Company</label>
+                        <input disabled={!isEditing} {...register(`experience.${index}.company`)} className="block w-full px-4 py-3 bg-white border border-slate-200 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 rounded-xl text-slate-900 disabled:opacity-70 transition-all" />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-bold text-slate-700 mb-2">Position</label>
+                        <input disabled={!isEditing} {...register(`experience.${index}.position`)} className="block w-full px-4 py-3 bg-white border border-slate-200 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 rounded-xl text-slate-900 disabled:opacity-70 transition-all" />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-bold text-slate-700 mb-2">Start Date</label>
+                        <input disabled={!isEditing} {...register(`experience.${index}.startDate`)} className="block w-full px-4 py-3 bg-white border border-slate-200 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 rounded-xl text-slate-900 disabled:opacity-70 transition-all" />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-bold text-slate-700 mb-2">End Date</label>
+                        <input disabled={!isEditing} {...register(`experience.${index}.endDate`)} className="block w-full px-4 py-3 bg-white border border-slate-200 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 rounded-xl text-slate-900 disabled:opacity-70 transition-all" />
+                      </div>
                     </div>
-                    <input
-                      type="email"
-                      value={user?.email || ""}
-                      disabled
-                      className="block w-full pl-11 pr-4 py-3.5 bg-slate-100 border border-slate-200 rounded-xl text-slate-500 font-medium cursor-not-allowed"
-                    />
+                    <label className="block text-sm font-bold text-slate-700 mb-2">Description</label>
+                    <textarea disabled={!isEditing} {...register(`experience.${index}.description`)} rows={4} className="block w-full px-4 py-3 bg-white border border-slate-200 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 rounded-xl text-slate-900 disabled:opacity-70 transition-all" placeholder="- Implemented feature X..."></textarea>
                   </div>
-                </div>
+                ))}
+                {isEditing && (
+                  <button type="button" onClick={() => appendExp({ company: "", position: "", location: "", startDate: "", endDate: "", description: "" })} className="w-full py-3 border-2 border-dashed border-slate-300 rounded-xl text-slate-500 font-bold hover:bg-slate-50 hover:border-blue-400 hover:text-blue-600 transition-all flex items-center justify-center gap-2">
+                    <Plus className="w-4 h-4" /> Add Experience
+                  </button>
+                )}
+              </section>
 
-                {/* Phone Number */}
-                <div>
-                  <label className="block text-sm font-bold text-slate-700 mb-2">Phone Number</label>
-                  <div className="relative group">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                      <Phone className="h-5 w-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+              {/* Education */}
+              <section>
+                <h2 className="text-xl font-bold text-slate-900 mb-6 border-b border-slate-100 pb-2">Education</h2>
+                {eduFields.map((field, index) => (
+                  <div key={field.id} className="p-6 border border-slate-200 rounded-xl mb-4 bg-slate-50 relative group">
+                    {isEditing && (
+                      <button type="button" onClick={() => removeEdu(index)} className="absolute top-4 right-4 text-slate-400 hover:text-red-500">
+                        <Trash2 className="w-5 h-5" />
+                      </button>
+                    )}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-bold text-slate-700 mb-2">Institution</label>
+                        <input disabled={!isEditing} {...register(`education.${index}.institution`)} className="block w-full px-4 py-3 bg-white border border-slate-200 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 rounded-xl text-slate-900 disabled:opacity-70 transition-all" />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-bold text-slate-700 mb-2">Degree / Course</label>
+                        <input disabled={!isEditing} {...register(`education.${index}.degree`)} className="block w-full px-4 py-3 bg-white border border-slate-200 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 rounded-xl text-slate-900 disabled:opacity-70 transition-all" />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-bold text-slate-700 mb-2">Start Date</label>
+                        <input disabled={!isEditing} {...register(`education.${index}.startDate`)} className="block w-full px-4 py-3 bg-white border border-slate-200 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 rounded-xl text-slate-900 disabled:opacity-70 transition-all" />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-bold text-slate-700 mb-2">End Date</label>
+                        <input disabled={!isEditing} {...register(`education.${index}.endDate`)} className="block w-full px-4 py-3 bg-white border border-slate-200 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 rounded-xl text-slate-900 disabled:opacity-70 transition-all" />
+                      </div>
                     </div>
-                    <input
-                      type="tel"
-                      name="phone"
-                      disabled={!isEditing}
-                      value={formData.phone}
-                      onChange={handleChange}
-                      placeholder="+1 (555) 000-0000"
-                      className="block w-full pl-11 pr-4 py-3.5 bg-slate-50/50 border border-slate-200 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 rounded-xl text-slate-900 font-medium disabled:opacity-70 disabled:cursor-not-allowed transition-all"
-                    />
                   </div>
-                </div>
+                ))}
+                {isEditing && (
+                  <button type="button" onClick={() => appendEdu({ institution: "", degree: "", startDate: "", endDate: "" })} className="w-full py-3 border-2 border-dashed border-slate-300 rounded-xl text-slate-500 font-bold hover:bg-slate-50 hover:border-blue-400 hover:text-blue-600 transition-all flex items-center justify-center gap-2">
+                    <Plus className="w-4 h-4" /> Add Education
+                  </button>
+                )}
+              </section>
 
-                {/* Location */}
-                <div>
-                  <label className="block text-sm font-bold text-slate-700 mb-2">Location</label>
-                  <div className="relative group">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                      <MapPin className="h-5 w-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+              {/* Projects */}
+              <section>
+                <h2 className="text-xl font-bold text-slate-900 mb-6 border-b border-slate-100 pb-2">Projects</h2>
+                {projFields.map((field, index) => (
+                  <div key={field.id} className="p-6 border border-slate-200 rounded-xl mb-4 bg-slate-50 relative group">
+                    {isEditing && (
+                      <button type="button" onClick={() => removeProj(index)} className="absolute top-4 right-4 text-slate-400 hover:text-red-500">
+                        <Trash2 className="w-5 h-5" />
+                      </button>
+                    )}
+                    <div className="grid grid-cols-1 gap-4 mb-4">
+                      <div>
+                        <label className="block text-sm font-bold text-slate-700 mb-2">Project Name</label>
+                        <input disabled={!isEditing} {...register(`projects.${index}.name`)} className="block w-full px-4 py-3 bg-white border border-slate-200 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 rounded-xl text-slate-900 disabled:opacity-70 transition-all" />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-bold text-slate-700 mb-2">Description</label>
+                        <textarea disabled={!isEditing} {...register(`projects.${index}.description`)} rows={3} className="block w-full px-4 py-3 bg-white border border-slate-200 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 rounded-xl text-slate-900 disabled:opacity-70 transition-all"></textarea>
+                      </div>
                     </div>
-                    <input
-                      type="text"
-                      name="location"
-                      disabled={!isEditing}
-                      value={formData.location}
-                      onChange={handleChange}
-                      placeholder="e.g. San Francisco, CA"
-                      className="block w-full pl-11 pr-4 py-3.5 bg-slate-50/50 border border-slate-200 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 rounded-xl text-slate-900 font-medium disabled:opacity-70 disabled:cursor-not-allowed transition-all"
-                    />
                   </div>
-                </div>
+                ))}
+                {isEditing && (
+                  <button type="button" onClick={() => appendProj({ name: "", description: "" })} className="w-full py-3 border-2 border-dashed border-slate-300 rounded-xl text-slate-500 font-bold hover:bg-slate-50 hover:border-blue-400 hover:text-blue-600 transition-all flex items-center justify-center gap-2">
+                    <Plus className="w-4 h-4" /> Add Project
+                  </button>
+                )}
+              </section>
 
-                {/* Academics */}
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-bold text-slate-700 mb-2">Highest Academic Qualification</label>
-                  <div className="relative group">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                      <GraduationCap className="h-5 w-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
-                    </div>
-                    <input
-                      type="text"
-                      name="academics"
-                      disabled={!isEditing}
-                      value={formData.academics}
-                      onChange={handleChange}
-                      placeholder="e.g. B.Sc. in Computer Science, Stanford University"
-                      className="block w-full pl-11 pr-4 py-3.5 bg-slate-50/50 border border-slate-200 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 rounded-xl text-slate-900 font-medium disabled:opacity-70 disabled:cursor-not-allowed transition-all"
-                    />
+              {/* Additional Information */}
+              <section>
+                <h2 className="text-xl font-bold text-slate-900 mb-6 border-b border-slate-100 pb-2">Additional Information</h2>
+                <div className="space-y-6">
+                  <div>
+                    <label className="block text-sm font-bold text-slate-700 mb-2">Skills (Comma separated)</label>
+                    <textarea disabled={!isEditing} {...register("skills")} rows={2} className="block w-full px-4 py-3 bg-slate-50/50 border border-slate-200 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 rounded-xl text-slate-900 font-medium disabled:opacity-70 disabled:cursor-not-allowed transition-all" placeholder="React, Node.js, Design..." />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-slate-700 mb-2">Certifications (Comma separated)</label>
+                    <textarea disabled={!isEditing} {...register("certifications")} rows={2} className="block w-full px-4 py-3 bg-slate-50/50 border border-slate-200 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 rounded-xl text-slate-900 font-medium disabled:opacity-70 disabled:cursor-not-allowed transition-all" placeholder="AWS Certified..." />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-slate-700 mb-2">Hobbies & Interests (Comma separated)</label>
+                    <textarea disabled={!isEditing} {...register("interests")} rows={2} className="block w-full px-4 py-3 bg-slate-50/50 border border-slate-200 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 rounded-xl text-slate-900 font-medium disabled:opacity-70 disabled:cursor-not-allowed transition-all" placeholder="Photography, Traveling..." />
                   </div>
                 </div>
-
-                {/* Professional Bio */}
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-bold text-slate-700 mb-2">Professional Bio</label>
-                  <div className="relative group">
-                    <div className="absolute top-4 left-0 pl-4 flex items-start pointer-events-none">
-                      <BookOpen className="h-5 w-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
-                    </div>
-                    <textarea
-                      name="bio"
-                      disabled={!isEditing}
-                      value={formData.bio}
-                      onChange={handleChange}
-                      rows={4}
-                      placeholder="Tell us a little about your professional background and goals..."
-                      className="block w-full pl-11 pr-4 py-3.5 bg-slate-50/50 border border-slate-200 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 rounded-xl text-slate-900 font-medium disabled:opacity-70 disabled:cursor-not-allowed transition-all resize-none"
-                    />
-                  </div>
-                </div>
-              </div>
+              </section>
 
               {isEditing && (
-                <div className="flex justify-end gap-4 pt-6 border-t border-slate-100">
+                <div className="flex justify-end gap-4 mt-8 pt-6 border-t border-slate-200">
                   <button
                     type="button"
                     onClick={() => {
                       setIsEditing(false);
-                      setFormData({
-                        name: user.name || "",
-                        phone: user.phone || "",
-                        location: user.location || "",
-                        academics: user.academics || "",
-                        bio: user.bio || "",
-                      });
+                      reset();
                     }}
                     className="px-6 py-3.5 rounded-xl font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors"
                   >
@@ -361,7 +435,7 @@ export default function Profile() {
                     ) : (
                       <>
                         <Save className="w-5 h-5" />
-                        Save Changes
+                        Save Profile Master
                       </>
                     )}
                   </button>
