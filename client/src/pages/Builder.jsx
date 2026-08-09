@@ -239,6 +239,10 @@ export default function Builder() {
                       <input {...register(`education.${index}.degree`)} className="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white" />
                     </div>
                     <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">Percentage / CGPA</label>
+                      <input {...register(`education.${index}.grade`)} className="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white" />
+                    </div>
+                    <div>
                       <label className="block text-sm font-medium text-slate-700 mb-1">Start Date</label>
                       <input {...register(`education.${index}.startDate`)} placeholder="e.g. 2018" className="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white" />
                     </div>
@@ -249,7 +253,7 @@ export default function Builder() {
                   </div>
                 </div>
               ))}
-              <button type="button" onClick={() => appendEdu({ institution: "", degree: "", startDate: "", endDate: "" })} className="w-full py-3 border-2 border-dashed border-slate-200 rounded-xl text-slate-500 font-medium hover:bg-slate-50 hover:border-blue-300 hover:text-blue-600 transition-all flex items-center justify-center gap-2">
+              <button type="button" onClick={() => appendEdu({ institution: "", degree: "", grade: "", startDate: "", endDate: "" })} className="w-full py-3 border-2 border-dashed border-slate-200 rounded-xl text-slate-500 font-medium hover:bg-slate-50 hover:border-blue-300 hover:text-blue-600 transition-all flex items-center justify-center gap-2">
                 <Plus className="w-4 h-4" /> Add Education
               </button>
             </section>
@@ -326,18 +330,20 @@ export default function Builder() {
 
             {formData.summary && (
               <div className="mb-3">
-                <h2 className="text-[15px] font-bold mb-1 border-b-[1.5px] border-black">Career Objective</h2>
+                <h2 className="text-[15px] font-bold leading-none">Career Objective</h2>
+                <hr className="border-t-[1.5px] border-black mb-2 mt-1" />
                 <p className="text-[13px] leading-tight whitespace-pre-wrap">{formData.summary}</p>
               </div>
             )}
 
             {formData.education && formData.education.length > 0 && (
               <div className="mb-3">
-                <h2 className="text-[15px] font-bold mb-1 border-b-[1.5px] border-black">Education</h2>
+                <h2 className="text-[15px] font-bold leading-none">Education</h2>
+                <hr className="border-t-[1.5px] border-black mb-2 mt-1" />
                 <ul className="list-disc ml-5 space-y-1">
                   {formData.education.map((edu, i) => (
                     <li key={i} className="text-[13px] leading-tight">
-                      <span className="font-bold">{edu.degree}</span> {edu.institution} | {edu.startDate} - {edu.endDate}
+                      <span className="font-bold">{edu.degree}</span> {edu.institution} | {edu.startDate} - {edu.endDate}{edu.grade ? ` | ${edu.grade}` : ''}
                     </li>
                   ))}
                 </ul>
@@ -346,7 +352,8 @@ export default function Builder() {
 
             {formData.experience && formData.experience.length > 0 && (
               <div className="mb-3">
-                <h2 className="text-[15px] font-bold mb-1 border-b-[1.5px] border-black">Internship & Experience</h2>
+                <h2 className="text-[15px] font-bold leading-none">Internship & Experience</h2>
+                <hr className="border-t-[1.5px] border-black mb-2 mt-1" />
                 <div className="space-y-3">
                   {formData.experience.map((exp, i) => (
                     <div key={i}>
@@ -365,7 +372,8 @@ export default function Builder() {
 
             {formData.projects && formData.projects.length > 0 && (
               <div className="mb-3">
-                <h2 className="text-[15px] font-bold mb-1 border-b-[1.5px] border-black">Academic Projects</h2>
+                <h2 className="text-[15px] font-bold leading-none">Academic Projects</h2>
+                <hr className="border-t-[1.5px] border-black mb-2 mt-1" />
                 <div className="space-y-3">
                   {formData.projects.map((proj, i) => (
                     <div key={i}>
@@ -381,7 +389,8 @@ export default function Builder() {
 
             {formData.skills && formData.skills.length > 0 && (
               <div className="mb-3">
-                <h2 className="text-[15px] font-bold mb-1 border-b-[1.5px] border-black">Technical Skills</h2>
+                <h2 className="text-[15px] font-bold leading-none">Technical Skills</h2>
+                <hr className="border-t-[1.5px] border-black mb-2 mt-1" />
                 <p className="text-[13px] leading-tight whitespace-pre-wrap ml-4 list-disc" style={{ display: 'list-item' }}>
                   {typeof formData.skills === "string" ? formData.skills : formData.skills.join(", ")}
                 </p>
@@ -390,7 +399,8 @@ export default function Builder() {
 
             {formData.certifications && formData.certifications.length > 0 && (
               <div className="mb-3">
-                <h2 className="text-[15px] font-bold mb-1 border-b-[1.5px] border-black">Certifications</h2>
+                <h2 className="text-[15px] font-bold leading-none">Certifications</h2>
+                <hr className="border-t-[1.5px] border-black mb-2 mt-1" />
                 <p className="text-[13px] leading-tight whitespace-pre-wrap ml-4 list-disc" style={{ display: 'list-item' }}>
                   {typeof formData.certifications === "string" ? formData.certifications : formData.certifications.join(", ")}
                 </p>
@@ -399,7 +409,8 @@ export default function Builder() {
 
             {formData.interests && formData.interests.length > 0 && (
               <div className="mb-3">
-                <h2 className="text-[15px] font-bold mb-1 border-b-[1.5px] border-black">Hobbies & Interests</h2>
+                <h2 className="text-[15px] font-bold leading-none">Hobbies & Interests</h2>
+                <hr className="border-t-[1.5px] border-black mb-2 mt-1" />
                 <p className="text-[13px] leading-tight whitespace-pre-wrap ml-4 list-disc" style={{ display: 'list-item' }}>
                   {typeof formData.interests === "string" ? formData.interests : formData.interests.join(", ")}
                 </p>
