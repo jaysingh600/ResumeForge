@@ -348,6 +348,10 @@ export default function Profile() {
                         <input disabled={!isEditing} {...register(`education.${index}.degree`)} className="block w-full px-4 py-3 bg-white border border-slate-200 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 rounded-xl text-slate-900 disabled:opacity-70 transition-all" />
                       </div>
                       <div>
+                        <label className="block text-sm font-bold text-slate-700 mb-2">Percentage / CGPA</label>
+                        <input disabled={!isEditing} {...register(`education.${index}.grade`)} className="block w-full px-4 py-3 bg-white border border-slate-200 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 rounded-xl text-slate-900 disabled:opacity-70 transition-all" />
+                      </div>
+                      <div>
                         <label className="block text-sm font-bold text-slate-700 mb-2">Start Date</label>
                         <input disabled={!isEditing} {...register(`education.${index}.startDate`)} className="block w-full px-4 py-3 bg-white border border-slate-200 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 rounded-xl text-slate-900 disabled:opacity-70 transition-all" />
                       </div>
@@ -359,7 +363,7 @@ export default function Profile() {
                   </div>
                 ))}
                 {isEditing && (
-                  <button type="button" onClick={() => appendEdu({ institution: "", degree: "", startDate: "", endDate: "" })} className="w-full py-3 border-2 border-dashed border-slate-300 rounded-xl text-slate-500 font-bold hover:bg-slate-50 hover:border-blue-400 hover:text-blue-600 transition-all flex items-center justify-center gap-2">
+                  <button type="button" onClick={() => appendEdu({ institution: "", degree: "", grade: "", startDate: "", endDate: "" })} className="w-full py-3 border-2 border-dashed border-slate-300 rounded-xl text-slate-500 font-bold hover:bg-slate-50 hover:border-blue-400 hover:text-blue-600 transition-all flex items-center justify-center gap-2">
                     <Plus className="w-4 h-4" /> Add Education
                   </button>
                 )}
