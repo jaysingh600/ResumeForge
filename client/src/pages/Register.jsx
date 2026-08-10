@@ -39,8 +39,13 @@ export default function Register() {
         email: data.email,
         password: data.password
       });
-      login(response.data.user, response.data.token);
-      navigate("/dashboard");
+      const user = response.data.user;
+      login(user, response.data.token);
+      if (user.role === 'admin') {
+        navigate("/admin/dashboard");
+      } else {
+        navigate("/dashboard");
+      }
     } catch (err) {
       setError(err.response?.data?.message || "Something went wrong. Please try again.");
     }
@@ -96,7 +101,7 @@ export default function Register() {
                   className={`block w-full pl-11 pr-4 py-3.5 bg-slate-50/50 border ${
                     errors.name ? "border-red-500 focus:ring-red-500" : "border-slate-200 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500"
                   } rounded-xl text-slate-900 focus:outline-none focus:bg-white transition-all font-medium`}
-                  placeholder="John Doe"
+                  placeholder="Enter you name"
                 />
               </div>
               {errors.name && <p className="mt-2 text-sm text-red-500 font-medium">{errors.name.message}</p>}
@@ -114,7 +119,7 @@ export default function Register() {
                   className={`block w-full pl-11 pr-4 py-3.5 bg-slate-50/50 border ${
                     errors.email ? "border-red-500 focus:ring-red-500" : "border-slate-200 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500"
                   } rounded-xl text-slate-900 focus:outline-none focus:bg-white transition-all font-medium`}
-                  placeholder="you@example.com"
+                  placeholder="Enter you email"
                 />
               </div>
               {errors.email && <p className="mt-2 text-sm text-red-500 font-medium">{errors.email.message}</p>}

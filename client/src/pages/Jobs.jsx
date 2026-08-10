@@ -9,87 +9,7 @@ import {
 } from "lucide-react";
 import Navbar from "../components/landing/Navbar";
 
-// Dummy Data
-const MOCK_JOBS = [
-  {
-    id: 1,
-    title: "Senior Frontend Engineer",
-    company: "TechNova Solutions",
-    location: "San Francisco, CA (Hybrid)",
-    salary: "$140k - $180k",
-    type: "Full-time",
-    logo: "T",
-    color: "from-blue-500 to-indigo-600",
-    tags: ["React", "TypeScript", "Tailwind"],
-    postedAt: "2 hours ago",
-    match: 94
-  },
-  {
-    id: 2,
-    title: "Product Designer",
-    company: "CreativeFlow",
-    location: "Remote",
-    salary: "$120k - $150k",
-    type: "Full-time",
-    logo: "C",
-    color: "from-purple-500 to-pink-500",
-    tags: ["Figma", "UI/UX", "Prototyping"],
-    postedAt: "5 hours ago",
-    match: 88
-  },
-  {
-    id: 3,
-    title: "Backend Developer",
-    company: "DataSync",
-    location: "New York, NY",
-    salary: "$130k - $170k",
-    type: "Contract",
-    logo: "D",
-    color: "from-emerald-400 to-teal-500",
-    tags: ["Node.js", "MongoDB", "AWS"],
-    postedAt: "1 day ago",
-    match: 91
-  },
-  {
-    id: 4,
-    title: "Full Stack Engineer",
-    company: "StartupX",
-    location: "Remote",
-    salary: "$110k - $160k",
-    type: "Full-time",
-    logo: "S",
-    color: "from-orange-400 to-red-500",
-    tags: ["React", "Node.js", "GraphQL"],
-    postedAt: "2 days ago",
-    match: 85
-  },
-  {
-    id: 5,
-    title: "Marketing Manager",
-    company: "GrowthLabs",
-    location: "Austin, TX (On-site)",
-    salary: "$90k - $120k",
-    type: "Full-time",
-    logo: "G",
-    color: "from-yellow-400 to-orange-500",
-    tags: ["SEO", "Campaigns", "Analytics"],
-    postedAt: "3 days ago",
-    match: 75
-  },
-  {
-    id: 6,
-    title: "Data Scientist",
-    company: "AI Dynamics",
-    location: "Remote",
-    salary: "$150k - $200k",
-    type: "Full-time",
-    logo: "A",
-    color: "from-cyan-400 to-blue-500",
-    tags: ["Python", "Machine Learning", "SQL"],
-    postedAt: "4 days ago",
-    match: 97
-  }
-];
+// Jobs will be fetched from API
 
 export default function Jobs() {
   const { user, token, isAuthenticated } = useAuthStore();
@@ -104,13 +24,55 @@ export default function Jobs() {
   const [isApplying, setIsApplying] = useState(false);
   const [applicationSuccess, setApplicationSuccess] = useState(false);
 
+  const [jobs, setJobs] = useState([]);
+  const [isLoadingJobs, setIsLoadingJobs] = useState(true);
+
   useEffect(() => {
     if (isAuthenticated && token) {
       fetchResumes(token);
     }
   }, [isAuthenticated, token, fetchResumes]);
 
-  const filteredJobs = MOCK_JOBS.filter(job => 
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        const res = await fetch('http://localhost:5000/api/jobs');
+        if (res.ok) {
+          const data = await res.json();
+          const colors = [
+            "from-blue-500 to-indigo-600",
+            "from-purple-500 to-pink-500",
+            "from-emerald-400 to-teal-500",
+            "from-orange-400 to-red-500",
+            "from-yellow-400 to-orange-500",
+            "from-cyan-400 to-blue-500"
+          ];
+          
+          const formattedJobs = data.map((job, index) => ({
+            id: job._id,
+            title: job.title,
+            company: job.company,
+            location: job.location,
+            salary: job.salary || "Competitive",
+            type: "Full-time",
+            logo: job.company ? job.company.charAt(0).toUpperCase() : "J",
+            color: colors[index % colors.length],
+            tags: ["Full-time", job.location?.toLowerCase().includes("remote") ? "Remote" : "On-site"],
+            postedAt: new Date(job.createdAt).toLocaleDateString(),
+            match: 85 + (index % 10)
+          }));
+          setJobs(formattedJobs);
+        }
+      } catch (error) {
+        console.error("Error fetching jobs:", error);
+      } finally {
+        setIsLoadingJobs(false);
+      }
+    };
+    fetchJobs();
+  }, []);
+
+  const filteredJobs = jobs.filter(job => 
     job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     job.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
     job.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -136,23 +98,48 @@ export default function Jobs() {
     }
   };
 
-  const submitApplication = () => {
+  const submitApplication = async () => {
     if (!selectedResumeId && !selectedFile) return;
     
     setIsApplying(true);
-    // Simulate API call
-    setTimeout(() => {
-      setIsApplying(false);
-      setApplicationSuccess(true);
+    try {
+      const formData = new FormData();
+      formData.append('jobId', selectedJob.id);
       
-      // Auto close after success
-      setTimeout(() => {
-        setIsApplyModalOpen(false);
-        setApplicationSuccess(false);
-        setSelectedJob(null);
-        setSelectedFile(null);
-      }, 3000);
-    }, 1500);
+      if (selectedResumeId) {
+        formData.append('resumeId', selectedResumeId);
+      }
+      
+      if (selectedFile) {
+        formData.append('resumeFile', selectedFile);
+      }
+
+      const res = await fetch('http://localhost:5000/api/applications', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        body: formData
+      });
+
+      if (res.ok) {
+        setApplicationSuccess(true);
+        setTimeout(() => {
+          setIsApplyModalOpen(false);
+          setApplicationSuccess(false);
+          setSelectedJob(null);
+          setSelectedFile(null);
+        }, 3000);
+      } else {
+        const data = await res.json();
+        alert(data.message || "Failed to apply");
+      }
+    } catch (error) {
+      console.error("Error submitting application:", error);
+      alert("Error submitting application");
+    } finally {
+      setIsApplying(false);
+    }
   };
 
   const containerVariants = {
@@ -187,6 +174,12 @@ export default function Jobs() {
             </Link>
             
             <div className="flex items-center gap-4">
+              {user?.role === 'admin' && (
+                <Link to="/admin/jobs" className="flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-slate-900 bg-white border border-slate-200 hover:border-slate-300 px-4 py-2 rounded-xl transition-all shadow-sm">
+                  <Briefcase className="w-4 h-4" />
+                  Admin Jobs
+                </Link>
+              )}
               <Link to="/dashboard" className="flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-slate-900 bg-white border border-slate-200 hover:border-slate-300 px-4 py-2 rounded-xl transition-all shadow-sm">
                 <Home className="w-4 h-4" />
                 Dashboard
@@ -463,7 +456,7 @@ export default function Jobs() {
                     </button>
                     <button 
                       onClick={submitApplication}
-                      disabled={!selectedResumeId || isApplying}
+                      disabled={(!selectedResumeId && !selectedFile) || isApplying}
                       className="px-8 py-3 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg flex items-center gap-2 min-w-[140px] justify-center"
                     >
                       {isApplying ? (

@@ -9,14 +9,13 @@ export default function Navbar() {
           <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
             <Sparkles className="w-5 h-5 text-white" />
           </div>
-          // logo
           <span className="font-bold text-xl text-slate-900 tracking-tight">ResumeForge</span>
         </Link>
         
         <div className="hidden md:flex items-center gap-8 font-medium text-sm text-slate-600">
-          <a href="#features" className="hover:text-blue-600 transition-colors">Features</a>
-          <a href="#how-it-works" className="hover:text-blue-600 transition-colors">How it works</a>
-          <a href="#templates" className="hover:text-blue-600 transition-colors">Templates</a>
+          <a href="/#features" className="hover:text-blue-600 transition-colors">Features</a>
+          <a href="/#how-it-works" className="hover:text-blue-600 transition-colors">How it works</a>
+          <a href="/#templates" className="hover:text-blue-600 transition-colors">Templates</a>
           <Link to="/jobs" className="hover:text-blue-600 transition-colors font-semibold text-slate-800">Job Portal</Link>
         </div>
 

@@ -32,8 +32,13 @@ export default function Login() {
       setError(null);
       // In a real app, this points to process.env.VITE_API_URL using env file here
       const response = await axios.post("http://localhost:5000/api/auth/login", data);
-      login(response.data.user, response.data.token);
-      navigate("/dashboard");
+      const user = response.data.user;
+      login(user, response.data.token);
+      if (user.role === 'admin') {
+        navigate("/admin/dashboard");
+      } else {
+        navigate("/dashboard");
+      }
     } catch (err) {
       setError(err.response?.data?.message || "Something went wrong. Please try again.");
     }

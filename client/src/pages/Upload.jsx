@@ -10,7 +10,7 @@ export default function Upload() {
   const [status, setStatus] = useState("idle");
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
-  const { token } = useAuthStore();
+  const { token, user, updateProfile } = useAuthStore();
 
   const onDrop = useCallback((acceptedFiles) => {
     if (acceptedFiles.length > 0) {
@@ -48,6 +48,26 @@ export default function Upload() {
       // We pass the parsed data to the builder
       // For now, we'll store it in localStorage or state, but since we navigate, localStorage is easiest or a Zustand store
       localStorage.setItem("resume_parsed_data", JSON.stringify(response.data));
+      
+      try {
+        const parsed = response.data;
+        const profileUpdate = {
+          name: parsed.personalInfo?.fullName || user?.name || "",
+          phone: parsed.personalInfo?.phone || user?.phone || "",
+          location: parsed.personalInfo?.address || user?.location || "",
+          linkedin: parsed.personalInfo?.linkedin || user?.linkedin || "",
+          github: parsed.personalInfo?.github || user?.github || "",
+          portfolio: parsed.personalInfo?.portfolio || user?.portfolio || "",
+          bio: parsed.summary || user?.bio || "",
+          skills: Array.isArray(parsed.skills) ? parsed.skills.join(", ") : (parsed.skills || user?.skills || ""),
+          education: parsed.education && parsed.education.length > 0 ? parsed.education : user?.education || [],
+          experience: parsed.experience && parsed.experience.length > 0 ? parsed.experience : user?.experience || [],
+          projects: parsed.projects && parsed.projects.length > 0 ? parsed.projects : user?.projects || []
+        };
+        await updateProfile(profileUpdate, token);
+      } catch (err) {
+        console.error("Failed to update profile from resume:", err);
+      }
       
       setTimeout(() => {
         navigate("/builder");
