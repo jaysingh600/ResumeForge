@@ -1,5 +1,5 @@
 # ResumeAi (ResumeForge)
-# make resume
+# make resume and apply job
 An AI-powered resume builder and job application tracking platform. This application allows users to seamlessly build and manage their resumes, extract details from uploaded existing resumes, generate tailored professional content using Google Gemini AI, and track job applications.
 
 ## Features
